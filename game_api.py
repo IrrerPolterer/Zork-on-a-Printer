@@ -50,6 +50,10 @@ def restore():
         game.expect(":")
         game.sendline(SAVEFILE)
         game.expect(">")
+        if "Ok." in game.before.decode("UTF-8"):
+            return True
+    return False
+    
 
 
 def save():
