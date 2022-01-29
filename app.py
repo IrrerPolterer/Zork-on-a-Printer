@@ -91,8 +91,7 @@ def print2paper(txt, cmd="", author=""):
     """
     
     # connect to printer
-    #n = Network(PRINTER_ADDRESS)
-    n=Dummy()
+    n = Network(PRINTER_ADDRESS)
     
     # print author and command
     if cmd:
