@@ -1,0 +1,16 @@
+# Logs, Configs, Data, Environment
+*.sav
+*.log
+*.db
+*.csv
+*.ini
+*.bin
+*.conf
+*.yml
+*.json
+*log/
+*config/
+*env/
+.vscode/
+__pycache__/
+.webassets-cache
