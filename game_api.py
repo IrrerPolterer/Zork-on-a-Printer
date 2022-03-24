@@ -1,5 +1,6 @@
 import pexpect
 import os
+from charset_normalizer import from_bytes
 
 
 GAMEFILE = "zork1.z5"
@@ -20,7 +21,13 @@ def start(width=48):
     game = pexpect.spawn(f"bash -c \"$(pwd)/dfrotz -p -w {width} $(pwd)/{GAMEFILE}\"", timeout=5)
 
     game.expect(">")
-    output = game.before.decode('utf-8').replace("\r", "").strip()
+    try:
+        output = game.before.decode('utf-8').replace("\r", "").strip()
+    except Exception:
+        try:
+            output = str(from_bytes(game.before).best()).replace("\r", "").strip()
+        except Exception:
+            output = "[output error]"
 
     return output
 
