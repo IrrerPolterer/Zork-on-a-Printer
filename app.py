@@ -12,7 +12,6 @@ from printer_api import tsp_print
 
 QUEUE_LOOKBACK = 1
 VIDEO_ID = argv[1]
-FONT = "Ubuntu Mono Bold Nerd Font Complete Mono.ttf"
 FONT = "Meslo LG L Bold Nerd Font Complete Mono.ttf"
 TEXT_WIDTH = 48
 
