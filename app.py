@@ -99,7 +99,11 @@ def print2paper(txt, cmd="", author=""):
         line = author[:13] + ".." if len(author) > 15 else author
         line += " > " if author else "> "
         line += cmd
-        tsp_print(line, text_width=TEXT_WIDTH, cut=False)
+        try:
+            tsp_print(line, text_width=TEXT_WIDTH, cut=False)
+        except Exception:
+            author = author or "someone"
+            tsp_print(f"[ERROR] Whoopsie, {author} broke something! Let's try that again, shall we?", text_width=TEXT_WIDTH, cut=False)
 
     # walk through all lines of the game-text
     location = None

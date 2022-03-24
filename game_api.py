@@ -27,7 +27,7 @@ def start(width=48):
         try:
             output = str(from_bytes(game.before).best()).replace("\r", "").strip()
         except Exception:
-            output = "[output error]"
+            output = "[ERROR] Oops, something broke. Let's try that again!"
 
     return output
 
@@ -41,7 +41,13 @@ def step(cmd):
     game.sendline(cmd)
 
     game.expect(">")
-    output = game.before.decode('utf-8').replace("\r", "").strip()
+    try:
+        output = game.before.decode('utf-8').replace("\r", "").strip()
+    except Exception:
+        try:
+            output = str(from_bytes(game.before).best()).replace("\r", "").strip()
+        except Exception:
+            output = "[ERROR] Oops, something broke. Let's try that again!"
 
     return output
 
