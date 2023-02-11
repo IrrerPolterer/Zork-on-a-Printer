@@ -10,10 +10,20 @@ import re
 import game_api as game
 from printer_api import tsp_print
 
-QUEUE_LOOKBACK = 1 # 1 -> effectively no lookback, which makes sense in this case
+
 VIDEO_ID = argv[1] if len(argv) == 2 else None
 FONT = "Meslo LG L Bold Nerd Font Complete Mono.ttf"
 TEXT_WIDTH = 48
+
+FORBIDDEN_CMDS = [
+    "save",
+    "restore",
+    "restart",
+    "quit",
+    "verbose",
+    "brief",
+    "superbrief",
+]
 
 chat_queue = Queue()
 terminate_event = Event()
@@ -21,7 +31,7 @@ terminate_event = Event()
 
 def chat_crawler():
     """
-    Continuously retrieve chat messages from YT stream and plug them into the queue 
+    Continuously retrieve chat messages from YT stream and plug them into the queue
     """
 
     chat = create(video_id=VIDEO_ID)
@@ -31,15 +41,17 @@ def chat_crawler():
 
     terminate_event.set()
 
+
 def local_input():
     """
     Read local input as an alternative to YT chat
     """
 
     while not terminate_event.is_set():
-        chat_queue.put(("LOCAL PLAYER", input().strip()))
+        chat_queue.put(("[LOCAL PLAYER]", input().strip()))
 
     terminate_event.set()
+
 
 def game_loop():
     """
@@ -48,7 +60,6 @@ def game_loop():
 
     while not terminate_event.is_set():
         try:
-
             # start & restore the game
             txt = game.start(width=TEXT_WIDTH)
             if game.restore():
@@ -60,23 +71,19 @@ def game_loop():
             # interactive game cycle
             while not terminate_event.is_set():
                 try:
-
-                    # retrieve latest player message
-                    n = spool_messages()
-                    if n > 0:
-                        print(f"...skipping {n} messages...")
-
+                    # retrieve latest commands from queue
+                    spool_messages()
                     author, message = chat_queue.get(timeout=10)
-                    print(f"[{author}] \'{message}\'")
 
-                    # execute game step
-                    txt = game.step(message)
-                    print2paper(txt, message, author)
-
-                    # autosave
-                    game.save()
-
-                    sleep(3)
+                    if message.strip() not in FORBIDDEN_CMDS:
+                        # execute game step
+                        print(f"[{author}] '{message}'")
+                        txt = game.step(message)
+                        print2paper(txt, message, author)
+                        # autosave
+                        game.save()
+                        # pace the game
+                        sleep(3)
 
                 except Empty:
                     print("...waiting for new messages...")
@@ -87,15 +94,13 @@ def game_loop():
 
 def spool_messages():
     """
-    Skip messages in the queue if queue gets too long, so the game play doesn't drag behind incoming chats too much
+    Skip queue ahead to the latest message
     """
     n = chat_queue.qsize()
-    if n > QUEUE_LOOKBACK:
-        skip_messages = n - QUEUE_LOOKBACK
-        for _ in range(skip_messages):
+    if n > 1:
+        print(f"...skipping {n-1} messages...")
+        for _ in range(n - 1):
             chat_queue.get_nowait()
-        return skip_messages
-    return 0
 
 
 def print2paper(txt, cmd="", author=""):
@@ -112,7 +117,11 @@ def print2paper(txt, cmd="", author=""):
             tsp_print(line, text_width=TEXT_WIDTH, cut=False)
         except Exception:
             author = author or "someone"
-            tsp_print(f"[ERROR] Whoopsie, {author} broke something! Let's try that again, shall we?", text_width=TEXT_WIDTH, cut=False)
+            tsp_print(
+                f"[ERROR] Whoopsie, {author} broke something! Let's try that again, shall we?",
+                text_width=TEXT_WIDTH,
+                cut=False,
+            )
 
     # walk through all lines of the game-text
     location = None
@@ -120,7 +129,9 @@ def print2paper(txt, cmd="", author=""):
         # print game-text header with inversed colors
         if re.match(".+[S|Score]: -?\d+\s+[M|Moves]: -?\d+", line):
             location = re.findall(".*(?=[S|Score]:)", line)[0].strip()
-            tsp_print(line, fg="#fff", bg="#000", text_width=TEXT_WIDTH, cut=False)
+            tsp_print(
+                line, fg="#fff", bg="#000", text_width=TEXT_WIDTH, cut=False
+            )
         # skip command & location echo
         elif line in [cmd, location]:
             continue
@@ -129,12 +140,12 @@ def print2paper(txt, cmd="", author=""):
             tsp_print(line, text_width=TEXT_WIDTH, cut=False)
 
     # add empty lines for spacing and close connection
-    tsp_print("\n"*2, text_width=TEXT_WIDTH, cut=True)
+    tsp_print("\n" * 2, text_width=TEXT_WIDTH, cut=True)
 
 
 def main():
     """
-    Start game-loop and run chat crawler 
+    Start game-loop and run chat crawler
     """
 
     try:
