@@ -10,8 +10,8 @@ import re
 import game_api as game
 from printer_api import tsp_print
 
-QUEUE_LOOKBACK = 1
-VIDEO_ID = argv[1]
+QUEUE_LOOKBACK = 1 # 1 -> effectively no lookback, which makes sense in this case
+VIDEO_ID = argv[1] if len(argv) == 2 else None
 FONT = "Meslo LG L Bold Nerd Font Complete Mono.ttf"
 TEXT_WIDTH = 48
 
@@ -31,6 +31,15 @@ def chat_crawler():
 
     terminate_event.set()
 
+def local_input():
+    """
+    Read local input as an alternative to YT chat
+    """
+
+    while not terminate_event.is_set():
+        chat_queue.put(("LOCAL PLAYER", input().strip()))
+
+    terminate_event.set()
 
 def game_loop():
     """
@@ -131,7 +140,10 @@ def main():
     try:
         game_loop_thread = Thread(target=game_loop)
         game_loop_thread.start()
-        chat_crawler()
+        local_input_thread = Thread(target=local_input)
+        local_input_thread.start()
+        if VIDEO_ID:
+            chat_crawler()
         game_loop_thread.join()
 
     finally:
