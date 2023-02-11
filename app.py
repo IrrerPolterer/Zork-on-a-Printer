@@ -13,9 +13,10 @@ from printer_api import tsp_print
 
 VIDEO_ID = argv[1] if len(argv) == 2 else None
 FONT = "Meslo LG L Bold Nerd Font Complete Mono.ttf"
-TEXT_WIDTH = 48
+TEXT_WIDTH = 42
 
 FORBIDDEN_CMDS = [
+    "",
     "save",
     "restore",
     "restart",
@@ -79,10 +80,7 @@ def game_loop():
                         # execute game step
                         print(f"[{author}] '{message}'")
                         txt = game.step(message)
-                        if (
-                            not f'I don\'t know the word "{message.strip()}".'
-                            in txt
-                        ) and (
+                        if (not f"I don't know the word" in txt) and (
                             not f"There was no verb in that sentence!" in txt
                         ):
                             print2paper(txt, message, author)
