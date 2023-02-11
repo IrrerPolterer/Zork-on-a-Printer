@@ -79,11 +79,17 @@ def game_loop():
                         # execute game step
                         print(f"[{author}] '{message}'")
                         txt = game.step(message)
-                        print2paper(txt, message, author)
-                        # autosave
-                        game.save()
-                        # pace the game
-                        sleep(3)
+                        if (
+                            not f'I don\'t know the word "{message.strip()}".'
+                            in txt
+                        ) and (
+                            not f"There was no verb in that sentence!" in txt
+                        ):
+                            print2paper(txt, message, author)
+                            # autosave
+                            game.save()
+                            # pace the game
+                            sleep(3)
 
                 except Empty:
                     print("...waiting for new messages...")
