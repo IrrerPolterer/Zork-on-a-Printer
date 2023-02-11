@@ -1,10 +1,10 @@
 import pexpect
 import os
 from charset_normalizer import from_bytes
+from os import environ
 
-
-GAMEFILE = "zork1.z5"
-SAVEFILE = "zork1.sav"
+GAMEFILE = environ.get("GAME_FILE", "zork1.z5")
+SAVEFILE = environ.get("SAVE_FILE", "zork1.sav")
 
 game = None
 
