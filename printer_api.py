@@ -3,6 +3,7 @@ from StarTSPImage import imageToRaster
 from socket import create_connection, error as socket_error
 from textwrap import fill
 from time import sleep
+from os import environ
 
 
 def text_to_image(text, output=None, font_size=50, font_path=None, text_width=None, padding=(3, 3, 3, 3), fg="#000", bg="#FFF"):
@@ -43,7 +44,7 @@ def tsp_print(text, cut=True, *args, **kwargs):
 
     while True:
         try:
-            con = create_connection(("10.0.0.51", 9100))
+            con = create_connection((environ.get("THERMO_PRINTER_ADDRESS", "thermo-printer.lan"), 9100))
             break
         except socket_error:
             pass
