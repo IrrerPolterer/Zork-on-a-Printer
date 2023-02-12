@@ -20,6 +20,7 @@ FORBIDDEN_CMDS = [
     "save",
     "restore",
     "restart",
+    "reboot",
     "quit",
     "verbose",
     "brief",
@@ -155,6 +156,7 @@ def print2paper(txt, cmd="", author=""):
             continue
         # print game-text line
         else:
+            print(line)
             tsp_print(
                 line,
                 text_width=TEXT_WIDTH,
