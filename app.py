@@ -1,15 +1,15 @@
-from distutils import text_file
-from pytchat import create
-from threading import Thread, Event
-from queue import Queue, Empty
-from sys import argv
-from pexpect import TIMEOUT, EOF
-from time import sleep
 import re
+from distutils import text_file
+from queue import Empty, Queue
+from sys import argv
+from threading import Event, Thread
+from time import sleep
+
+from pexpect import EOF, TIMEOUT
+from pytchat import create
 
 import game_api as game
 from printer_api import tsp_print
-
 
 VIDEO_ID = argv[1] if len(argv) == 2 else None
 FONT = "Meslo LG L Bold Nerd Font Complete Mono.ttf"
@@ -118,13 +118,19 @@ def print2paper(txt, cmd="", author=""):
         line += " > " if author else "> "
         line += cmd
         try:
-            tsp_print(line, text_width=TEXT_WIDTH, cut=False)
+            tsp_print(
+                line,
+                text_width=TEXT_WIDTH,
+                cut=False,
+                font_path=FONT,
+            )
         except Exception:
             author = author or "someone"
             tsp_print(
                 f"[ERROR] Whoopsie, {author} broke something! Let's try that again, shall we?",
                 text_width=TEXT_WIDTH,
                 cut=False,
+                font_path=FONT,
             )
 
     # walk through all lines of the game-text
@@ -134,14 +140,24 @@ def print2paper(txt, cmd="", author=""):
         if re.match(".+[S|Score]: -?\d+\s+[M|Moves]: -?\d+", line):
             location = re.findall(".*(?=[S|Score]:)", line)[0].strip()
             tsp_print(
-                line, fg="#fff", bg="#000", text_width=TEXT_WIDTH, cut=False
+                line,
+                fg="#fff",
+                bg="#000",
+                text_width=TEXT_WIDTH,
+                cut=False,
+                font_path=FONT,
             )
         # skip command & location echo
         elif line in [cmd, location]:
             continue
         # print game-text line
         else:
-            tsp_print(line, text_width=TEXT_WIDTH, cut=False)
+            tsp_print(
+                line,
+                text_width=TEXT_WIDTH,
+                cut=False,
+                font_path=FONT,
+            )
 
     # add empty lines for spacing and close connection
     tsp_print("\n" * 2, text_width=TEXT_WIDTH, cut=True)
