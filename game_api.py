@@ -9,7 +9,7 @@ SAVEFILE = environ.get("SAVE_FILE", "zork1.sav")
 game = None
 
 
-def start(width=48, first_cmd="verbose"):
+def start(width=48):
     """
     Start the game and return the initial output
     """
@@ -21,10 +21,6 @@ def start(width=48, first_cmd="verbose"):
     game = pexpect.spawn(
         f'bash -c "$(pwd)/dfrotz -p -w {width} $(pwd)/{GAMEFILE}"', timeout=5
     )
-
-    if first_cmd:
-        game.expect(">")
-        game.sendline(first_cmd)
 
     game.expect(">")
     try:
