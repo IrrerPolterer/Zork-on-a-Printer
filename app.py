@@ -78,7 +78,6 @@ def game_loop():
 
                     if message.strip() not in FORBIDDEN_CMDS:
                         # execute game step
-                        print(f"[{author}] '{message}'")
                         txt = game.step(message)
                         if (not f"I don't know the word" in txt) and (
                             not f"There was no verb in that sentence!" in txt
@@ -88,6 +87,8 @@ def game_loop():
                             game.save()
                             # pace the game
                             sleep(3)
+                    else:
+                        print()
 
                 except Empty:
                     print("...waiting for new messages...")
@@ -118,6 +119,7 @@ def print2paper(txt, cmd="", author=""):
         line += " > " if author else "> "
         line += cmd
         try:
+            print(line)
             tsp_print(
                 line,
                 text_width=TEXT_WIDTH,
@@ -139,6 +141,7 @@ def print2paper(txt, cmd="", author=""):
         # print game-text header with inversed colors
         if re.match(".+[S|Score]: -?\d+\s+[M|Moves]: -?\d+", line):
             location = re.findall(".*(?=[S|Score]:)", line)[0].strip()
+            print(line)
             tsp_print(
                 line,
                 fg="#fff",
